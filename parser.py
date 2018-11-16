@@ -314,7 +314,6 @@ def parse_karolina(resdata):
         page_req = requests.get(resdata[3])
         if page_req.status_code != 200:
             raise IOError('Bad HTTP responce code')
-
         soup = BeautifulSoup(page_req.text, 'html.parser')
         days = soup.find('table', {'class':'table lunch_menu animation'})
         day = days.find('tbody', {'class':'lunch-day-content'})
@@ -323,7 +322,7 @@ def parse_karolina(resdata):
             lines.append(dish.get_text().strip().split(':')[1] + '<br/>')
 
     except Exception as err:
-        sys.stderr.write(err)
+        sys.stderr.write(str(err) + '\n')
 
     lines += restaurant_end()
     return lines
@@ -418,7 +417,7 @@ def parse_rudbeck(resdata):
     Parse the menu of Bistro Rudbeck
     '''
     lines = list()
-    lines += restaurant_start(fix_for_html(resdata[1]), 'Solna',
+    lines += restaurant_start(fix_for_html(resdata[1]), 'Uppsala',
                               resdata[2], resdata[4])
 
     page_req = requests.get(resdata[3])
