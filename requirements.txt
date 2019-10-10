@@ -4,3 +4,4 @@ requests
 flask
 flask-caching
 gunicorn
+flask-cors
