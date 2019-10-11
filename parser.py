@@ -49,8 +49,11 @@ def restaurant(func):
                 'map_url': res_data['osm']}
         data.update(func(res_data))
         return data
+    helper.__name__ = func.__name__
+    helper.__doc__ = func.__doc__
 
     return helper
+
 
 def get_parser(url: str) -> BeautifulSoup:
     """
@@ -305,10 +308,11 @@ def parse_livet(res_data):
         if started:
             if par.find(text=re.compile(get_weekday(tomorrow=True).capitalize())):
                 break
-            if par.find(text=re.compile('&nbsp;')):
+            if par.find(text=re.compile('[Pp]ersonuppgifterna')):
                 break
             text = par.find(text=True, recursive=False)
-            data['menu'].append(text)
+            if text:
+                data['menu'].append(text)
             continue
         if par.find(text=re.compile(get_weekday().capitalize() +
                                     '.*' +
