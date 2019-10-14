@@ -1,7 +1,13 @@
 <template>
 <div id="app">
-    <restaurant-entry v-for="restaurant in restaurants" :key="restaurant.name" :restaurant_info="restaurant">
-    </restaurant-entry>
+  <div v-if="restaurants.length == 0">Waiting for data from API...</div>
+  <restaurant-entry v-for="restaurant in sortedSolna" :key="restaurant.name" :restaurant_info="restaurant">
+  </restaurant-entry>
+  <div id="spacer">
+    <hr id="location_divider" v-if="sortedSolna.length != 0 && sortedUppsala.length != 0" />
+  </div>
+  <restaurant-entry v-for="restaurant in sortedUppsala" :key="restaurant.name" :restaurant_info="restaurant">
+  </restaurant-entry>
   <div class="endnote">Code available at <a href="https://github.com/talavis/lunch-menu">Github</a>.
     Patches are very welcome.
   </div>
@@ -19,10 +25,21 @@ export default {
   },
   data () {
     return {
-      restaurants: null,
+      restaurants: [],
       active: ['bikupan', 'hjulet']
     }
   },
+  computed: {
+    sortedSolna () {
+      let chosen = this.restaurants.filter((rest) => rest.campus == 'Solna')
+      return chosen.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0))
+    },
+    sortedUppsala () {
+      let chosen = this.restaurants.filter((rest) => rest.campus == 'Uppsala')
+      return chosen.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0))
+    }
+  },
+
   mounted () {
     axios
       .get('http://scilifelab-lunches.herokuapp.com/api/restaurants')
@@ -40,14 +57,22 @@ export default {
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-    margin-top: 60px;
+    margin-top: 50px;
     letter-spacing: 0.01em;
-
-    .endnote {
-        font-size: 10px;
-        padding: 25px 0px 0px 0px;
-    }
-
-    font-family: 
 }
+
+.endnote {
+    font-size: 10px;
+    padding: 25px 0px 0px 0px;
+}
+
+
+#spacer {
+    padding: 25px 0px;
+}
+
+#location_divider {
+    width: 120px;
+}
+
 </style>
