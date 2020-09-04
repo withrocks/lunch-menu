@@ -68,12 +68,13 @@ MAPPER = {'jorpes': ps.parse_jorpes, 'glada': ps.parse_glada,
           'jons': ps.parse_jons, 'livet': ps.parse_livet,
           'nanna': ps.parse_nanna, 'svarta': ps.parse_svarta,
           'bikupan': ps.parse_bikupan, 'dufva': ps.parse_dufva,
-          'hubben': ps.parse_hubben, 'rudbeck': ps.parse_rudbeck}
+          'hubben': ps.parse_hubben, 'rudbeck': ps.parse_rudbeck,
+          'elma': ps.parse_elma}
 
 KI = ('jorpes', 'glada', 'haga', 'hjulet', 'jons',
       'livet', 'nanna', 'svarta')
 
-UU = ('bikupan', 'dufva', 'hubben', 'rudbeck')
+UU = ('bikupan', 'dufva', 'hubben', 'rudbeck', 'elma')
 
 ALL = KI + UU
 

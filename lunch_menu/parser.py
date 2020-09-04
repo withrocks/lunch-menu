@@ -57,7 +57,7 @@ def restaurant(func):
     return helper
 
 
-def get_parser(url: str) -> BeautifulSoup:
+def get_parser(url: str, encoding=None) -> BeautifulSoup:
     """
     Request page and create Beautifulsoup object
     """
@@ -197,25 +197,56 @@ def parse_dufva(res_data):
     '''
     data = {'menu': []}
     soup = get_parser(res_data['menu_url'])
-
     relevant = soup.find("div", {"id": "post"})
     menu_data = relevant.get_text().split('\n')
     dag = get_weekday()
     started = False
     for line in menu_data:
-        if line.strip() == "Vi har alltid veckans sallad, paj och soppa":
-            continue
+        line = line.strip()
         if not line:
             continue
-        if line.lower() == dag:
-            started = True
-            continue
-        if started:
-            if line[0] != '-':
-                data['menu'].append(line.strip())
-            else:
+        elif not started:
+            if line.startswith("-") and dag in line.lower():
+                started = True
+                continue
+        elif started:
+            if line.startswith("-"):
                 break
+            else:
+                data['menu'].append(line)
+
+        # if started:
+        #     if line[0] != '-':
+        #         data['menu'].append(line.strip())
+        #     else:
+        #         break
     return data
+
+
+@restaurant
+def parse_elma(res_data):
+    '''
+    Parse the menu of Glada restaurangen
+    '''
+    data = list()
+    soup = get_parser(res_data['menu_url'])
+    relevant = soup.find("div", {"class": "dishes-wrapper"})
+    dish_panels = soup.find_all("div", {"class": "dish-panel"})
+    for dish_panel in dish_panels:
+        header = dish_panel.find("h3")
+        header = header.get_text().strip()
+        # print(dish_panel)
+        description_els = dish_panel.find_all("p", {"class": "dish--desc"})
+        if header.lower() in ["veckans pizza", "dagens fångst", "veckans vegetariska", get_weekday()]:
+            description = [description_el.get_text().strip() for description_el in description_els]
+            description = " - ".join(description)
+            if header.lower() == get_weekday():
+                data.insert(0, description)
+            else:
+                data.append(header + ": " + description)
+
+
+    return {'menu': data}
 
 
 @restaurant
