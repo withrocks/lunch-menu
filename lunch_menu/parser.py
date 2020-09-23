@@ -156,37 +156,21 @@ def parse_bikupan(res_data: dict) -> dict:
     Parse the menu of Restaurang Bikupan
     '''
 
+    import calendar
+    import datetime
+
     def fmt_paragraph(p):
         return p.get_text().strip().replace('\n', ' ')
 
-    def find_todays_menu(menus):
-        today = datetime.datetime.today()
-        today = (today.month, today.day)
-        for day_menu in menus:
-            # We expect day to contain text similar to `Måndag 10/2`
-            date = day_menu.find('h6').text.split(' ')[1]
-            day, month = date.split('/')
-            if (int(month), int(day)) == today:
-                menu = list()
-                # Bikupan has both English and Swedish, we are only showing Swedish:
-                courses = defaultdict(list)
-                for p in day_menu.find_all('p'):
-                    if 'class' in p.attrs and p['class'][0] == 'eng-meny':
-                        courses['english'].append(p)
-                    else:
-                        courses['swedish'].append(p)
-                for sv in courses['swedish']:
-                    menu.append(fmt_paragraph(sv))
-                return menu
-        raise Exception("Can't find today's menu")
-
     data = {'menu': []}
     soup = get_parser(res_data['menu_url'])
-    menus = soup.find_all('div', {'class': 'menu-item'})
-    menu = list(find_todays_menu(menus))
-
+    weekday = datetime.datetime.today().weekday()
+    weekday = calendar.day_name[weekday].lower()
+    menu = soup.find('div', {'class': weekday})
+    menu = menu.find_all('p', {'class': 'eng-meny'})
     for course in menu:
-        data['menu'].append(course)
+        data['menu'].append(course.get_text())
+
     return data
 
 
@@ -240,6 +224,7 @@ def parse_elma(res_data):
         if header.lower() in ["veckans pizza", "dagens fångst", "veckans vegetariska", get_weekday()]:
             description = [description_el.get_text().strip() for description_el in description_els]
             description = " - ".join(description)
+            description = description.replace('\r\n', ' ')
             if header.lower() == get_weekday():
                 data.insert(0, description)
             else:

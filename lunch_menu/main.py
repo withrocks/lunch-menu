@@ -241,11 +241,12 @@ def main(restaurants, cache, slack_channel, slack_user, slack_emoji, fmt):
         if slack_channel.startswith('#'):
             slack_channel = '#' + slack_channel
         URL = os.environ['LUNCH_MENU_SLACK_WEBHOOK']
-        post_payload = {'channel': slack_channel,
+        data = {'channel': slack_channel,
                         'username': slack_user,
                         'icon_emoji': slack_emoji,
                         'text': menu}
-        post_response = requests.post(URL, data=json.dumps(post_payload))
+        data = json.dumps(data)
+        post_response = requests.post(URL, data=data)
         print('Response[{}]: {}'.format(post_response.status_code, post_response.text))
     else:
         print(menu)
